@@ -37,6 +37,9 @@ if __name__ == '__main__':
     team_id = this_team[0]['id']
 
     # we want maintainers of group
+    # TODO: org owners have the chops of maintainer, but don't get
+    # reported that way. So, really need to intersect the set of team
+    # members with the set of org owners to get that info.
     params = {'role': 'maintainer'}
 
     team_maintainers_url = '%s?%s' % (
