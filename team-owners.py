@@ -20,6 +20,22 @@ def get_all_responses(url, headers):
         payload.extend(resp.json())
     return payload
 
+def get_owners():
+    headers = {
+        # new api requires new accept per
+        # https://developer.github.com/changes/2015-06-24-api-enhancements-for-working-with-organization-permissions/#preview-period
+        'Accept': 'application/vnd.github.ironman-preview+json',
+        'Authorization': 'token %s' % get_token()
+    }
+    params = {'role': 'admin'}
+
+    admins_with_1fa_url = '%s?%s' % (
+        'https://api.github.com/orgs/%s/members' % 'mozilla',
+        urllib.urlencode(params)
+    )
+    owners = get_all_responses(admins_with_1fa_url, headers)
+    logins = [x['login'] for x in owners]
+    return set(logins)
 
 if __name__ == '__main__':
     headers = {
@@ -29,7 +45,7 @@ if __name__ == '__main__':
     # first, get all teams, so we can find team id
     list_teams_url = 'https://api.github.com/orgs/%s/teams' % 'mozilla'
     teams = get_all_responses(list_teams_url, headers=headers)
-    this_team = [x for x in teams if x['name'] == 'quality']
+    this_team = [x for x in teams if x['name'] == 'Releng']
     if not this_team:
         raise SystemExit('No such team')
     elif len(this_team) > 1:
@@ -59,9 +75,21 @@ if __name__ == '__main__':
         print 'No maintainers yet, members are:'
         team_members_url = 'https://api.github.com/teams/%s/members' % team_id
         team_members = get_all_responses(team_members_url, headers=headers)
-        for a in team_members:
-            print a['login']
-            email_targets.append(a['login'])
+
+        # we wait until now to look for owners -- that lets maintainers
+        # carry the mail load for their team :)
+        owners = set(get_owners())
+        members = set([x['login'] for x in team_members])
+        owner_members = owners & members
+        if owner_members:
+            print "Oh, but an owner is a member:"
+            for a in owner_members:
+                print a
+                email_targets.append(a)
+        else:
+            for a in team_members:
+                print a['login']
+                email_targets.append(a['login'])
     # get email address now
     no_email_addr = []
     print "The emails you need are:"
