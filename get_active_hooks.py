@@ -60,6 +60,8 @@ def get_hook_name(hook):
 
 def report_hooks(gh, org, active_only=False, unique_only=False,
         do_ping=False, yaml_out=False):
+    # if user tab completed, we'll have file name - convert to org name
+    org = org if not org.endswith('.db') else org[:-3]
     org_handle = gh.organization(org)
     with tinydb.TinyDB('{}.db'.format(org)) as db:
         q = tinydb.Query()
