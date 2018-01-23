@@ -9,6 +9,7 @@ While new repositories will be automatically added, deletes & updates
 are not handled. Manually remove the database to force a full query.
 """
 import argparse
+import time
 import client
 import logging
 import urlparse
@@ -59,7 +60,8 @@ def get_hook_name(hook):
     return name
 
 def report_hooks(gh, org, active_only=False, unique_only=False,
-        do_ping=False, yaml_out=False):
+                 do_ping=False, yaml_out=False, private_only=False,
+                 legacy_only=False):
     org_handle = gh.organization(org)
     with tinydb.TinyDB('{}.db'.format(org)) as db:
         q = tinydb.Query()
@@ -68,7 +70,11 @@ def report_hooks(gh, org, active_only=False, unique_only=False,
         org_struct['repo_list'] = repo_list
         unique_hooks = set()
         msg = "Active" if active_only else "All"
-        for repo in org_handle.repositories():
+        visibility = "private" if private_only else "all"
+        for repo in org_handle.repositories(type=visibility):
+            if private_only and not repo.private:
+                # skip public repos
+                continue
             repo_hooks = set()
             # try for existing data
             l = db.search(q.name == repo.name)
@@ -129,14 +135,22 @@ def parse_args():
     parser.add_argument("--ping", action="store_true",
                         help="Ping all hooks (not for cached repositories)")
     parser.add_argument("--yaml", help="Yaml ouput only", action="store_true")
-    return parser.parse_args()
+    parser.add_argument("--private", help="Only list private repos",
+                        action="store_true")
+    parser.add_argument("--legacy", help="Only list legacy service hooks",
+                        action="store_true")
+    args = parser.parse_args()
+    if args.legacy:
+        parser.error("Legacy only not implemented yet")
+    return args
 
 
 def main():
     args = parse_args()
     gh = client.get_github3_client()
     for org in args.org:
-        report_hooks(gh, org, args.active, args.unique, args.ping, args.yaml)
+        report_hooks(gh, org, args.active, args.unique, args.ping, args.yaml,
+                     args.private, args.legacy)
 
 
 if __name__ == '__main__':
