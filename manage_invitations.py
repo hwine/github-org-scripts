@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
 """
     Report and manage pending org invitations
 """
@@ -25,6 +26,7 @@ ToDo:
 import argparse  # NOQA
 import logging  # NOQA
 import arrow  # NOQA
+import argcomplete
 
 from client import get_github3_client  # NOQA
 # hack until invitations are supported upstream
@@ -130,6 +132,7 @@ def parse_args():
     parser.add_argument("orgs", nargs='*', default=['mozilla', ],
                         help='github organizations to check (defaults to '
                              'mozilla)')
+    argcomplete.autocomplete(parser)
     # make sure arrow is happy with the cutoff syntax
     args = parser.parse_args()
     try:

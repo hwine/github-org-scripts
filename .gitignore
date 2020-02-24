@@ -3,5 +3,7 @@
 cache/*\.json
 # for poetry
 .venv
+# for visible venvs, py2 & py3
+venv?
 # for jupyter notebooks
 .ipynb*
