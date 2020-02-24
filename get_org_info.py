@@ -114,7 +114,7 @@ class MyOrganizationsIterator(github3.structs.GitHubIterator):
         super(MyOrganizationsIterator, self).__init__(
             count=-1,  # get all
             url=me.session.base_url + "/user/orgs",
-            cls=github3.orgs.Organization,
+            cls=github3.orgs.ShortOrganization,
             session=me.session,
         )
 
