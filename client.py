@@ -18,8 +18,7 @@ def get_token():
 
 def get_github3_client():
     token = get_token()
-    gh = login(token=token)
-    return gh
+    return login(token=token)
 
 
 def sleep_if_rate_limited(gh, verbose=False):

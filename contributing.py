@@ -16,7 +16,7 @@ def get_files(repo, directory):
         # response.body contains json of the directory contents as a list of
         # dictionaries. The calling code wants a dictionary with file
         # names as keys.
-        names = dict(((x['name'], None) for x in response.body))
+        names = {x['name']: None for x in response.body}
     else:
         raise Exception("github3.py behavior changed")
     return names

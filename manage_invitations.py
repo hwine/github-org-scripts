@@ -45,8 +45,7 @@ logger = logging.getLogger(__name__)
 def get_cutoff_time(cutoff_delta):
     k, v = cutoff_delta.split('=', 2)
     args = {k: int(v)}
-    ok_after = arrow.now().replace(**args)
-    return ok_after
+    return arrow.now().replace(**args)
 
 
 def check_invites(gh, org_name, cancel=False, cutoff_delta="weeks=-2"):

@@ -34,8 +34,7 @@ def lock_pr(repo, number):
     # an issue, and use that interface (which still only supports lock, and not
     # lock reason)
     pr_as_issue = repo.issue(number)
-    success = pr_as_issue.lock()
-    return success
+    return pr_as_issue.lock()
 
 
 def close_prs(gh, organization=None, repository=None,

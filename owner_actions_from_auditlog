@@ -39,8 +39,7 @@ def parse_args():
                         help='GitHub org to process')
     parser.add_argument("audit_file",
                         help='JSON audit log to process')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():

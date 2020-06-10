@@ -41,10 +41,7 @@ def unpack_repo(owner_repo, default=None):
     """
 
     parts = owner_repo.split("/", 1)
-    if len(parts) is 2:
-        owner, repo = parts
-    else:
-        owner, repo = default, parts[0]
+    owner, repo = parts if len(parts) is 2 else (default, parts[0])
     return owner, repo
 
 
