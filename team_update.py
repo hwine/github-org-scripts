@@ -45,9 +45,9 @@ def update_team_membership(org, new_member_list, team_name=None, do_update=False
     # team must already exist in the org
     team = get_or_create_team(org, team_name)
     # get set of current members
-    current = set([x.login for x in team.members()])
+    current = {x.login for x in team.members()}
     # get set of new members
-    new = set([x.login for x in new_member_list])
+    new = {x.login for x in new_member_list}
     to_remove = current - new
     to_add = new - current
     no_change = new & current
