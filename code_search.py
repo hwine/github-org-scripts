@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 __doc__ = """Searches for code across multiple github orgs."""
 
 import argparse
@@ -8,7 +9,6 @@ from client import (
     get_github3_client,
     sleep_if_rate_limited,
 )
-
 
 DEFAULT_ORGS = [
     "mozilla",
@@ -26,6 +26,7 @@ def parse_args():
     parser.add_argument(
         "query",
         type=str,
+        nargs="*",
         help="code search query. syntax at https://help.github.com/articles/searching-code/",
     )
     parser.add_argument(
@@ -65,9 +66,11 @@ def main():
         print("{:<16}{:<32}{:<64}".format("org", "repo", "file path"))
         for result in gh.search_code(full_query):
             print("{0:<16}{1.repository.name:<32}{1.path:<64}".format(org, result))
+            # iterating though pages of search results uses calls
+            sleep_if_rate_limited(gh, verbose=args.verbose, min=3)
 
             if json_fout:
-                json_fout.write(result.to_json())
+                json_fout.write(result.as_json())
 
     if json_fout:
         # must explicitly close -- that's what outputs the closing delimiter

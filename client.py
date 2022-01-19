@@ -28,10 +28,16 @@ def get_github3_client():
     return gh
 
 
-def sleep_if_rate_limited(gh, verbose=False):
+# keep the most recently fetched rates object, so it can be inspected after a
+# rate limit response occurs
+rates = {}
+
+
+def sleep_if_rate_limited(gh, verbose=False, min: int = 1):
+    global rates
     rates = gh.rate_limit()
 
-    if not rates["resources"]["search"]["remaining"]:
+    if rates["resources"]["search"]["remaining"] <= min:
         reset_epoch = rates["resources"]["search"]["reset"]
 
         reset_dt, now = datetime.utcfromtimestamp(reset_epoch), datetime.utcnow()
