@@ -1,11 +1,13 @@
 gitrev := $(shell git rev-parse --short=10 HEAD)
 VENV_NAME := venv
-now := $(shell date --utc +%Y%m%dT%H%MZ)
+# GRRR - use '-u' instead of '--utc' for stupid darwin compatibility
+now := $(shell date -u +%Y%m%dT%H%MZ)
 github3_version:=1.1.0-$(now)-$(gitrev)
 port := 8888
 image_to_use := offboard-slim
 container_user_name := jovyan
 SOPS_credentials := $(SECOPS_SOPS_PATH)/off-boarding.yaml
+SET_SECRETS_OPTIONS :=
 
 DOCKER_OPTS :=
 
@@ -40,7 +42,7 @@ debug-build:
 # the build, so we get what we expect.
 .PHONY: run
 run:
-	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SOPS_credentials); \
+	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
 		export TZ=$$(./get_olson_tz.sh) ; \
 		docker run --rm --publish-all \
 			--env "GITHUB_PAT" \
@@ -62,7 +64,7 @@ run:
 
 .PHONY: run-edit
 run-edit:
-	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SOPS_credentials); \
+	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
 		export TZ=$$(./get_olson_tz.sh) ; \
 		docker run --rm --publish-all \
 			$(DOCKER_OPTS) \
@@ -83,14 +85,14 @@ run-edit:
 
 .PHONY: vscode
 vscode:
-	$(SHELL) -cex ' ( source set_secrets_in_env.sh $(SOPS_credentials); \
+	$(SHELL) -cex ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
 		export TZ=$$(./get_olson_tz.sh) ; \
 		code . \
 	) '
 
 .PHONY: jupyter
 jupyter:
-	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SOPS_credentials); \
+	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
 		jupyter-notebook ; \
 	) '
 
