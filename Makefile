@@ -85,7 +85,7 @@ run-edit:
 
 .PHONY: vscode
 vscode:
-	$(SHELL) -cex ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
+	$(SHELL) -ce ' ( source set_secrets_in_env.sh $(SET_SECRETS_OPTIONS) $(SOPS_credentials); \
 		export TZ=$$(./get_olson_tz.sh) ; \
 		code . \
 	) '
